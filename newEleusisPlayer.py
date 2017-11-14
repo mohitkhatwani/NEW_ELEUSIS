@@ -10,6 +10,8 @@ popuating decision table
 initialize board state and call populate_table for those cards and see if hypothesis comes to be true
 
 '''
+
+
 import populateDecisionTable
 from collections import defaultdict
 from operator import itemgetter
@@ -32,7 +34,7 @@ def get_information_gain(attributes, attr):
         if check == True:
             count += 1
     if count == 0:
-        return 1.0
+        return 0.0
     return count/len(check_list)
 #get best attribute
 attributes_list = []
@@ -40,6 +42,7 @@ for attr in attributes:
     info_gain = get_information_gain(attributes, attr)
     attributes_list.append((attr,info_gain))
 attributes_list.sort(key=itemgetter(1),reverse=True)
-print(attributes_list[0:20])
-
-
+for attr in attributes:
+    if get_information_gain(attributes,attr) != 0.0:
+        print("[------------------------]")
+        print(attr, "---------", attributes[attr],"_----_",get_information_gain(attributes,attr))

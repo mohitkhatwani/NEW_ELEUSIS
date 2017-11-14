@@ -5,28 +5,6 @@ called when a new card is played
 #structure would be a dict with key as strnig value of function and value as tuple of
 # function and arguments
 
-#   hypothesis with single cards
-'''
-    suit    C, D, H, S
-    color   B, R
-    value   1...13
-    is_royal    T, F
-    plus1
-    minus1
-    even
-    odd
-    
-'''
-
-#hypothesis with double cards
-'''
-     equal T, F
-     less
-     greater
-     and
-     not
-     if
-'''
 
 
 '''
@@ -44,8 +22,8 @@ def populate_attribute(attributes, curr, prev, prev2, valid):
 
     cards = [curr,prev,prev2]
     cards_names = ["current",'prev','prev2']
-    function_names = ["color", "even", "suit", "is_royal","odd"]
-    functions = [new_eleusis.color, new_eleusis.even, new_eleusis.suit, new_eleusis.is_royal, new_eleusis.odd]
+    function_names = [ "even", "is_royal","odd"]
+    functions = [new_eleusis.even, new_eleusis.is_royal, new_eleusis.odd]
 
     for card,card_name in zip(cards,cards_names):
         for func_names,func in zip(function_names,functions):
@@ -54,9 +32,11 @@ def populate_attribute(attributes, curr, prev, prev2, valid):
     #value list
     values = range(1,14)
 
-
     #suit list
     suits = ['C','D', 'H', 'S']
+
+    #color list
+    colors = ['B','R']
 
     function_names_two = ['equal', 'less', 'greater']
     functions_two = [new_eleusis.equal, new_eleusis.less, new_eleusis.greater]
@@ -66,21 +46,47 @@ def populate_attribute(attributes, curr, prev, prev2, valid):
             for value in values:
                 if func_name_two == 'equal':
                     attributes[func_name_two + "(value('"+card_name+"')," + str(value)+")"].append(func_two(new_eleusis.value(card),value))
+                    attributes[func_name_two + "(plus1(value('"+card_name+"'))," + str(value)+")"].append(func_two(new_eleusis.plus1(str(new_eleusis.value(card))),value))
+                    attributes[func_name_two + "(minus1(value('" + card_name + "'))," + str(value) + ")"].append(func_two(new_eleusis.minus1(str(new_eleusis.value(card))), value))
                 if func_name_two == 'less':
-                    if value != 1:
+                    if value != 1 and value != 13:
                         attributes[func_name_two + "(value('" + card_name +"')," +str(value)+")"].append(func_two(str(new_eleusis.value(card)),value))
+                        attributes[func_name_two + "(plus1((value('" + card_name + "'))," + str(value) + ")"].append(func_two(str(new_eleusis.plus1(str(new_eleusis.value(card)))),str(value)))
+                        attributes[func_name_two + "(minus1((value('" + card_name + "'))," + str(value) + ")"].append(func_two(str(new_eleusis.minus1(str(new_eleusis.value(card)))), value))
                 if func_name_two == "greater":
-                    if value != 13:
+                    if value != 13 and value != 1:
                         attributes[func_name_two + "(value('" + card_name +"'),"+str(value)+")"].append(func_two(str(new_eleusis.value(card)),str(value)))
+                        attributes[func_name_two+ "(plus1(value('" + card_name +"')," + str(value) + ")"].append(func_two(str(new_eleusis.plus1(str(new_eleusis.value(card)))),str(value)))
+                        attributes[func_name_two + "(minus1(value('" + card_name + "')," + str(value) + ")"].append(func_two(str(new_eleusis.minus1(str(new_eleusis.value(card)))), str(value)))
             for suit in suits:
                 if func_name_two == 'equal':
                     attributes[func_name_two + "(suit('" + card_name + "'),'" + suit+"')"].append(func_two(new_eleusis.suit(card),suit))
+                    if suit != 'S' and new_eleusis.suit(card) != 'S':
+                        attributes[func_name_two + "(plus1(suit('" + card_name + "'),'" + suit + "')"].append(func_two(new_eleusis.plus1(new_eleusis.suit(card)),suit))
+                    if suit != 'C' and new_eleusis.suit(card) != 'C':
+                        attributes[func_name_two + "(minus1(suit('" + card_name + "'),'" + suit + "')"].append(func_two(new_eleusis.minus1(new_eleusis.suit(card)), suit))
                 if func_name_two == 'less':
-                    if suit != 'C':
+                    if suit != 'C' and suit != 'S':
                         attributes[func_name_two + "(suit('" +card_name+"'),'" +suit+ "')"].append(func_two(str(new_eleusis.suit(card)),suit))
+                        if suit != 'S' and new_eleusis.suit(card) != 'S':
+                            attributes[func_name_two + "(plus1(suit('" + card_name + "'),'" + suit + "')"].append(func_two(new_eleusis.plus1(new_eleusis.suit(card)), suit))
+                        if suit != 'C' and new_eleusis.suit(card) != 'C':
+                            attributes[func_name_two + "(minus1(suit('" + card_name + "'),'" + suit + "')"].append(func_two(new_eleusis.minus1(new_eleusis.suit(card)), suit))
                 if func_name_two == 'greater':
-                    if suit != 'S':
+                    if suit != 'S' and suit != 'C':
                         attributes[func_name_two + "(suit('" +card_name+"')," +suit+"')"].append(func_two(str(new_eleusis.suit(card)),str(suit)))
+                        if suit != 'S' and new_eleusis.suit(card) != 'S':
+                            attributes[func_name_two + "(plus1(suit('" + card_name + "'),'" + suit + "')"].append(func_two(new_eleusis.plus1(new_eleusis.suit(card)), suit))
+                        if suit != 'C' and new_eleusis.suit(card) != 'C':
+                            attributes[func_name_two + "(minus1(suit('" + card_name + "'),'" + suit + "')"].append(func_two(new_eleusis.minus1(new_eleusis.suit(card)), suit))
+            for color in colors:
+                if func_name_two == 'equal':
+                    attributes[func_name_two + "(color("+card_name+"),'"+str(color)+"')"].append(func_two(new_eleusis.color(card),str(color)))
+                    attributes[func_name_two + "(plus1(color(" + card_name + ")),'" + str(color) + "')"].append(func_two(new_eleusis.plus1(new_eleusis.color(card)),str(color)))
+                    attributes[func_name_two + "(minus1(color(" + card_name + ")),'" + str(color) + "')"].append(func_two(new_eleusis.minus1(new_eleusis.color(card)), str(color)))
+
+
+
     for i in range(len(cards)-1):
         for j in range(i+1,len(cards)):
             for func_name_two,func_two in zip(function_names_two,functions_two):
@@ -89,9 +95,15 @@ def populate_attribute(attributes, curr, prev, prev2, valid):
                 attributes[func_name_two + "(color('" + cards_names[i] + "'),color('" + cards_names[j] + "'))"].append(func_two(str(new_eleusis.color(cards[i])), str(new_eleusis.color(cards[j]))))
                 attributes[func_name_two + "(suit('" + cards_names[i] + "'),suit('" + cards_names[j] + "'))"].append(func_two(str(new_eleusis.suit(cards[i])), str(new_eleusis.suit(cards[j]))))
 
+                attributes[func_name_two + "(plus1(" + cards_names[i] + ")," + cards_names[j] + ")"].append(func_two(cards[i], cards[j]))
+                attributes[func_name_two + "(plus1(value('" + cards_names[i] + "')),value('" + cards_names[j] + "'))"].append(func_two(str(new_eleusis.value(cards[i])), str(new_eleusis.value(cards[j]))))
+                attributes[func_name_two + "(plus1(color('" + cards_names[i] + "')),color('" + cards_names[j] + "'))"].append(func_two(str(new_eleusis.color(cards[i])), str(new_eleusis.color(cards[j]))))
+                attributes[func_name_two + "(plus1(suit('" + cards_names[i] + "')),suit('" + cards_names[j] + "'))"].append(func_two(str(new_eleusis.suit(cards[i])), str(new_eleusis.suit(cards[j]))))
 
-
-    #conjuctions of hypothesis
+                attributes[func_name_two + "(minus1(" + cards_names[i] + ")," + cards_names[j] + ")"].append(func_two(cards[i], cards[j]))
+                attributes[func_name_two + "(minus1(value('" + cards_names[i] + "')),value('" + cards_names[j] + "'))"].append(func_two(str(new_eleusis.value(cards[i])), str(new_eleusis.value(cards[j]))))
+                attributes[func_name_two + "(minus1(color('" + cards_names[i] + "')),color('" + cards_names[j] + "'))"].append(func_two(str(new_eleusis.color(cards[i])), str(new_eleusis.color(cards[j]))))
+                attributes[func_name_two + "(minus1(suit('" + cards_names[i] + "')),suit('" + cards_names[j] + "'))"].append(func_two(str(new_eleusis.suit(cards[i])), str(new_eleusis.suit(cards[j]))))
 
 
 

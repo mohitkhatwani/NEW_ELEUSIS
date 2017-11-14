@@ -92,8 +92,8 @@ def plus1(x):
     """Returns the next higher value, suit, or card in a suit;
        must be one. If a color, returns the other color"""
     if is_value(x):
-        assert value_to_number(x) < 13
-        return number_to_value(value_to_number(x) + 1)
+        assert int(x) < 13
+        return value_to_number(x) + 1
     elif is_suit(x):
         assert x != 'S'
         return "CDHS"["CDHS".index(x) + 1]
@@ -229,8 +229,9 @@ def parse(s):
     def parse2(s, i):
         if s[i] in function_names:
             f = to_function.get(s[i])
-            assert s[i + 1] == "(", "No open parenthesis after " + s[i]
+            assert s[i + 1] == "(", "'No open parenthesis after " + s[i]
             (arg, i) = parse2(s, i + 2)
+            print(arg,i)
             args = [arg]
             while s[i] != ")":
                 (arg, i) = parse2(s, i)
@@ -298,7 +299,7 @@ class Tree:
                 if expr == "current":
                     return current
                 elif expr == "previous":
-                    return previous 
+                    return previous
                 elif expr == "previous2":
                     return previous2
                 else:
