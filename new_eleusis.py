@@ -13,7 +13,7 @@ def is_color(s):
 
 def is_value(s):
     """Test if parameter is a number or can be interpreted as a number"""
-    return s.isdigit() or (len(s) == 1 and s[0] in "AJQK")
+    return isinstance(s,int) or (len(s) == 1 and s[0] in "AJQK") #change the function from isdigit to isinstance according to the requirement
 
 
 def is_card(s):
@@ -80,7 +80,7 @@ def less(a, b):
     elif is_value(a):
         return int(a) < int(b)
     else:
-        return a < b
+        return a < str(b)  #changed data type of b to string for comparision
 
 
 def greater(a, b):
@@ -92,7 +92,7 @@ def plus1(x):
     """Returns the next higher value, suit, or card in a suit;
        must be one. If a color, returns the other color"""
     if is_value(x):
-        assert int(x) < 13
+        assert int(x) < 13    #Changed datatype of x to integer
         return value_to_number(x) + 1
     elif is_suit(x):
         assert x != 'S'
@@ -231,7 +231,6 @@ def parse(s):
             f = to_function.get(s[i])
             assert s[i + 1] == "(", "'No open parenthesis after " + s[i]
             (arg, i) = parse2(s, i + 2)
-            print(arg,i)
             args = [arg]
             while s[i] != ")":
                 (arg, i) = parse2(s, i)

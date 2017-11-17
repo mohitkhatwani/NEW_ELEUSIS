@@ -1,48 +1,67 @@
-'''
-This module deals with functions of player
-selecting the best next card
-adding to board state
-popuating decision table
-'''
+
+import new_eleusis
+import random
+import decisionTree
+
+class Player():
+    def __init__(self, board, god_rule):
+        self.board = board
+        self.cards_played = 3
+        self.god_rule = god_rule
+        self.predictedRule = "iff(equal(True,False))"
+        self.dt = decisionTree.decisionTree()
+
+    def scientist(self):
+        self.dt.build_decision_tree(self.board[-1][0], self.board[-2][0], self.board[-3][0], True)
+        self.predictedRule = self.dt.getRules()[0]
+        while self.cards_played < 200:
+            card = self.select_card()
+            result = self.play(card)
+            if len(self.board) > 50:
+                self.predictedRule = self.dt.getRules()[0]
+                print("GOT IT!!")
+                return self.predictedRule
+            #print("debug",card, self.board[-1][0], self.board[-2][0], result)
+            self.dt.build_decision_tree(card, self.board[-1][0], self.board[-2][0], result)
+            self.predictedRule = self.dt.getRules()[0]
 
 
-'''
-initialize board state and call populate_table for those cards and see if hypothesis comes to be true
+    def play(self, card):
+        rule_tree = new_eleusis.parse(self.god_rule)
+        result = rule_tree.evaluate((self.board[-2][0], self.board[-1][0], card))
+        self.cards_played += 1
+        if result == True:
+            self.board.append((card,[]))
+            return True
+        else:
+            self.board[-1][1].append(card)
+            return False
 
-'''
+
+    def select_card(self):
+        num_correct = len(self.board)
+        num_incorrect = self.cards_played - num_correct
+        print("debug", self.predictedRule, num_correct, num_incorrect)
+        total_cards = self.getDeck()
+        if num_correct < num_incorrect:
+            for card in total_cards:
+                rule_tree = new_eleusis.parse(self.predictedRule)
+                result = rule_tree.evaluate((self.board[-2][0], self.board[-1][0], card))
+                if result == True:
+                    return card
+        else:
+            for card in total_cards:
+                rule_tree = new_eleusis.parse(self.predictedRule)
+                #print("here",self.board[-2][0], self.board[-1][0], card)
+                #print("here",rule_tree)
+                if not rule_tree.evaluate((self.board[-2][0], self.board[-1][0], card)):
+                    return card
 
 
-import populateDecisionTable
-from collections import defaultdict
-from operator import itemgetter
-
-board = [('10S',[]),('3H',[]),('6C',['KS','9C']),('6H',[]),('7D',[]),('9S',['AS'])]
-
-attributes = defaultdict(list)
-for i in range(2,len(board)):
-    curr = board[i][0]
-    prev = board[i-1][0]
-    prev2 = board[i-2][0]
-    attributes = populateDecisionTable.populate_attribute(attributes, curr, prev, prev2, valid = True)
-    if board[1] != []:
-        for curr in board[i][1]:
-            attributes = populateDecisionTable.populate_attribute(attributes, curr, board[i][0], board[i-1][0], valid = False)
-def get_information_gain(attributes, attr):
-    count = 0
-    check_list = attributes[attr]
-    for check in check_list:
-        if check == True:
-            count += 1
-    if count == 0:
-        return 0.0
-    return count/len(check_list)
-#get best attribute
-attributes_list = []
-for attr in attributes:
-    info_gain = get_information_gain(attributes, attr)
-    attributes_list.append((attr,info_gain))
-attributes_list.sort(key=itemgetter(1),reverse=True)
-for attr in attributes:
-    if get_information_gain(attributes,attr) != 0.0:
-        print("[------------------------]")
-        print(attr, "---------", attributes[attr],"_----_",get_information_gain(attributes,attr))
+    def getDeck(self):
+        deck = []
+        for suit in ['C', 'D', 'H', 'S']:
+            for i in range(1, 14):
+                deck.append(new_eleusis.number_to_value(i) + suit)
+        random.shuffle(deck)
+        return deck
