@@ -1,9 +1,9 @@
 New Eleusis Player Phase -2
 Team: NASH BELEIVERS
 
-Mohit Khatwani
-Priyank Agarwal
-Sarthak Mehta
+Mohit Khatwani,
+Priyank Agarwal,
+Sarthak Mehta,
 Rajat Patel
 
 This files provides all the instruction for running the NewEleusis Player Phase -2
