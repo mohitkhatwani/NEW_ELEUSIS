@@ -76,7 +76,7 @@ getSplitAttributes() -
 - The function returns output of all possible hypothesis with max information gain
 
 getInformationGain()-
--Function the return the count of the information gain calculated.
+- Function the return the count of the information gain calculated.
 
 getRules() -
 - The function return final rule value evaluated from the decision tree.
