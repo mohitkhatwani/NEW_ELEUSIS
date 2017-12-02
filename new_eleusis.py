@@ -13,11 +13,15 @@ def is_color(s):
 
 def is_value(s):
     """Test if parameter is a number or can be interpreted as a number"""
-    return isinstance(s,int) or (len(s) == 1 and s[0] in "AJQK") #change the function from isdigit to isinstance according to the requirement
+    s = str(s)
+    return s.isdigit() or (len(s) == 1 and s[0] in "AJQK")
 
 
 def is_card(s):
     """Test if parameter is a value followed by a suit"""
+    s = str(s)
+    if s.isdigit():
+        return False
     return is_suit(s[-1]) and is_value(s[:len(s) - 1])
 
 
@@ -78,9 +82,16 @@ def less(a, b):
         else:
             return value(a) < value(b)
     elif is_value(a):
-        return int(a) < int(b)
+        a = str(a)
+        b = str(b)
+        map = {'1': 'A', '11': 'J', '12': 'Q', '13': 'K'}
+        if a in map.keys():
+            a = map[a]
+        if b in map.keys():
+            b = map[b]
+        return value_to_number(a) < value_to_number(b)
     else:
-        return a < str(b)  #changed data type of b to string for comparision
+        return a < b
 
 
 def greater(a, b):
@@ -92,8 +103,8 @@ def plus1(x):
     """Returns the next higher value, suit, or card in a suit;
        must be one. If a color, returns the other color"""
     if is_value(x):
-        assert int(x) < 13    #Changed datatype of x to integer
-        return value_to_number(x) + 1
+        assert value_to_number(x) < 13
+        return number_to_value(value_to_number(x) + 1)
     elif is_suit(x):
         assert x != 'S'
         return "CDHS"["CDHS".index(x) + 1]
@@ -187,29 +198,28 @@ def scan(s):
         yield token
 
 
-def tree(s):
-    """Given a function in the usual "f(a, b)" notation, returns
-       a Tree representation of that function, for example,
-       equal(color(current),'R') becomes
-       Tree(equal(Tree(color(current)),'R')) """
-    tokens = list(scan(s))
-    if len(tokens) == 1:
-        return tokens[0]
-    expr = ""
-    functions = []  # a stack of functions
-    args = []  # a stack of argument lists
-    depth = 0
-    for i in range(0, len(tokens) - 1):
-        if tokens[i + 1] == '(':
-            f = to_function[tokens[i]]
-            depth += 1
-        expr += tokens[i]
-        if tokens[i] == ')':
-            expr += ')'
-            depth -= 1
-    assert depth == 1, "*** Unmatched parentheses ***"
-    return expr + '))'
-
+# def tree(s):
+#     """Given a function in the usual "f(a, b)" notation, returns
+#        a Tree representation of that function, for example,
+#        equal(color(current),'R') becomes
+#        Tree(equal(Tree(color(current)),'R')) """
+#     tokens = list(scan(s))
+#     if len(tokens) == 1:
+#         return tokens[0]
+#     expr = ""
+#     functions = [] # a stack of functions
+#     args = []      # a stack of argument lists
+#     depth = 0
+#     for i in range(0, len(tokens) - 1):
+#         if tokens[i + 1] == '(':
+#             f = to_function[tokens[i]]
+#             depth += 1
+#         expr += tokens[i]
+#         if tokens[i] == ')':
+#             expr += ')'
+#             depth -= 1
+#     assert depth == 1, "*** Unmatched parentheses ***"
+#     return expr
 
 def combine(f, args):
     """Makes a Tree from a function and a list of arguments"""
@@ -229,7 +239,7 @@ def parse(s):
     def parse2(s, i):
         if s[i] in function_names:
             f = to_function.get(s[i])
-            assert s[i + 1] == "(", "'No open parenthesis after " + s[i]
+            assert s[i + 1] == "(", "No open parenthesis after " + s[i]
             (arg, i) = parse2(s, i + 2)
             args = [arg]
             while s[i] != ")":
@@ -302,6 +312,10 @@ class Tree:
                 elif expr == "previous2":
                     return previous2
                 else:
+                    if expr == "True":
+                        expr = True
+                    elif expr == "False":
+                        expr = False
                     return expr
 
         try:
